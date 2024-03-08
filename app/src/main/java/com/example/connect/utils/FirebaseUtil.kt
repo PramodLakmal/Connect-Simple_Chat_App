@@ -58,5 +58,8 @@ object FirebaseUtil {
             userId2 + "_" + userId1
         }
     }
+    fun logout() {
+        FirebaseAuth.getInstance().signOut()
+    }
 
 }
