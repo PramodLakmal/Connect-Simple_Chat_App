@@ -2,7 +2,6 @@ package com.example.connect.model
 
 import com.google.firebase.Timestamp
 
-
 class ChatroomModel {
     var chatroomId: String? = null
     var userIds: List<String?>? = null

@@ -10,14 +10,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.example.connect.model.ChatMessageModel
 import com.example.connect.model.ChatroomModel
 import com.example.connect.model.UserModel
 import com.example.connect.utils.AndroidUtil
 import com.example.connect.utils.FirebaseUtil
+import com.example.easychat.adapter.ChatRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
-import java.util.Arrays
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Query
 
 class ChatActivity : AppCompatActivity() {
 
@@ -30,6 +36,7 @@ class ChatActivity : AppCompatActivity() {
     private var otherUser: UserModel? = null
     private lateinit var chatroomId: String
     private var chatroomModel: ChatroomModel? = null
+    var adapter: ChatRecyclerAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -63,7 +70,8 @@ class ChatActivity : AppCompatActivity() {
         }
 
 
-        getOrCreateChatroomModel()
+        orCreateChatroomModel
+        setupChatRecyclerView()
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -73,43 +81,60 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun getOrCreateChatroomModel() {
-        FirebaseUtil.getChatroomReference(chatroomId).get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val chatroomModel = task.result?.toObject(ChatroomModel::class.java)
-                if (chatroomModel == null) {
-                    // First time chat
-                    val newChatroomModel = ChatroomModel(
-                        chatroomId,
-                        otherUser?.let { listOf(FirebaseUtil.currentUserId(), it.userId) },
-                        Timestamp.now(),
-                        ""
-                    )
-                    FirebaseUtil.getChatroomReference(chatroomId).set(newChatroomModel)
-                }
+    fun setupChatRecyclerView() {
+        val query = FirebaseUtil.getChatroomMessageReference(chatroomId)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+        val options = FirestoreRecyclerOptions.Builder<ChatMessageModel>()
+            .setQuery(query, ChatMessageModel::class.java).build()
+        adapter = ChatRecyclerAdapter(options, applicationContext)
+        val manager = LinearLayoutManager(this)
+        manager.setReverseLayout(true)
+        recyclerView!!.setLayoutManager(manager)
+        recyclerView!!.setAdapter(adapter)
+        adapter!!.startListening()
+        adapter!!.registerAdapterDataObserver(object : AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                recyclerView!!.smoothScrollToPosition(0)
             }
-        }
+        })
     }
 
-    private fun sendMessageToUser(message: String) {
+    fun sendMessageToUser(message: String?) {
         chatroomModel?.lastMessageTimestamp = Timestamp.now()
         chatroomModel?.lastMessageSenderId = FirebaseUtil.currentUserId()
         chatroomModel?.lastMessage = message
-        chatroomModel?.let { FirebaseUtil.getChatroomReference(chatroomId).set(it) }
 
-        val chatMessageModel = ChatMessageModel.ChatMessageModel(
-            message,
-            FirebaseUtil.currentUserId(),
-            Timestamp.now()
-        )
+        FirebaseUtil.getChatroomReference(chatroomId).set(chatroomModel!!)
+        val chatMessageModel =
+            ChatMessageModel(message, FirebaseUtil.currentUserId(), Timestamp.now())
         FirebaseUtil.getChatroomMessageReference(chatroomId).add(chatMessageModel)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    messageInput.setText("")
-
+                    messageInput!!.setText("")
                 }
             }
     }
+
+    private val orCreateChatroomModel: Unit
+        get() {
+            FirebaseUtil.getChatroomReference(chatroomId).get()
+                .addOnCompleteListener { task: Task<DocumentSnapshot> ->
+                    if (task.isSuccessful) {
+                        chatroomModel = task.result.toObject(ChatroomModel::class.java)
+                        if (chatroomModel == null) {
+                            //first time chat
+                            chatroomModel = ChatroomModel(
+                                chatroomId,
+                                listOf(FirebaseUtil.currentUserId(), otherUser?.userId ?: ""),
+                                Timestamp.now(),
+                                ""
+                            )
+                            FirebaseUtil.getChatroomReference(chatroomId).set(chatroomModel!!)
+                        }
+                    }
+                }
+        }
 
 
 }

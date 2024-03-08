@@ -21,7 +21,7 @@ class SearchUserActivity : AppCompatActivity() {
     private lateinit var searchButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var recyclerView: RecyclerView
-    var adapter: SearchUserRecyclerAdapter? = null
+    private var adapter: SearchUserRecyclerAdapter? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +62,7 @@ class SearchUserActivity : AppCompatActivity() {
             .whereGreaterThanOrEqualTo("username", searchTerm)
             .whereLessThanOrEqualTo("username", searchTerm + '\uf8ff')
 
-        val options: FirestoreRecyclerOptions<UserModel> =
+        val options: FirestoreRecyclerOptions<UserModel?> =
             FirestoreRecyclerOptions.Builder<UserModel>()
                 .setQuery(query, UserModel::class.java).build()
 
