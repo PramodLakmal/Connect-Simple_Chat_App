@@ -90,17 +90,16 @@
 
 
         <EditText
+            android:id="@+id/login_mobile_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:hint="@string/otp"
-            android:inputType="number"
-            android:maxLength="6"
             android:layout_margin="10dp"
             android:background="@drawable/edit_text_rounded_corner"
             android:elevation="5dp"
-            android:id="@+id/login_mobile_number"
-            />
+            android:hint="@string/otp"
+            android:inputType="number"
+            android:maxLength="6"
+            android:padding="10dp" />
 
     </LinearLayout>
 
