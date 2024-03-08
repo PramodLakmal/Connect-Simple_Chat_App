@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.connect.utils.FirebaseUtil
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,8 +22,14 @@ class SplashActivity : AppCompatActivity() {
         }
 
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this@SplashActivity, LoginPhoneNumberActivity::class.java))
-            finish()
+
+                if (FirebaseUtil.isLoggedIn()) {
+                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                } else {
+                    startActivity(Intent(this@SplashActivity, LoginPhoneNumberActivity::class.java))
+                }
+                finish()
+
         }, 1000)
 
 

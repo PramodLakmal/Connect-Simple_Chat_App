@@ -72,7 +72,7 @@ class LoginOtpActivity : AppCompatActivity() {
         }
     }
 
-    fun sendOtp(phoneNumber: String?, isResend: Boolean) {
+    private fun sendOtp(phoneNumber: String?, isResend: Boolean) {
         startResendTimer()
         setInProgress(true)
         val builder = PhoneAuthOptions.newBuilder(mAuth)
@@ -135,7 +135,7 @@ class LoginOtpActivity : AppCompatActivity() {
         }
     }
 
-    fun startResendTimer() {
+    private fun startResendTimer() {
         resendOtpTextView.setEnabled(false)
         val timer = Timer()
         timer.scheduleAtFixedRate(object : TimerTask() {
