@@ -22,4 +22,6 @@
     <string name="search_user">Search User</string>
     <string name="search_image">search image</string>
     <string name="back_button">back button</string>
+    <string name="user_name">User name</string>
+    <string name="_000000000000">+000000000000</string>
 </resources>

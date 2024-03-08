@@ -48,8 +48,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("com.hbb20:ccp:2.7.1")
+    implementation(libs.ccp)
 
-    implementation (platform("com.google.firebase:firebase-bom:32.7.3"))
+    implementation (libs.firebase.bom)
     implementation ("com.google.firebase:firebase-auth")
+    implementation (libs.firebase.ui.firestore)
 }

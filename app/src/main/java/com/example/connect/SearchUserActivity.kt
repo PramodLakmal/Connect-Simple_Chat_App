@@ -7,8 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.connect.adapter.SearchUserRecyclerAdapter
+import com.example.connect.model.UserModel
 import com.example.connect.utils.FirebaseUtil
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.firestore.Query
 
 class SearchUserActivity : AppCompatActivity() {
 
@@ -16,6 +21,7 @@ class SearchUserActivity : AppCompatActivity() {
     private lateinit var searchButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var recyclerView: RecyclerView
+    var adapter: SearchUserRecyclerAdapter? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,5 +58,33 @@ class SearchUserActivity : AppCompatActivity() {
 
     private fun setupSearchRecyclerView(searchTerm: String) {
 
+        val query: Query = FirebaseUtil.allUserCollectionReference()
+            .whereGreaterThanOrEqualTo("username", searchTerm)
+            .whereLessThanOrEqualTo("username", searchTerm + '\uf8ff')
+
+        val options: FirestoreRecyclerOptions<UserModel> =
+            FirestoreRecyclerOptions.Builder<UserModel>()
+                .setQuery(query, UserModel::class.java).build()
+
+        adapter = SearchUserRecyclerAdapter(options, applicationContext)
+        recyclerView.setLayoutManager(LinearLayoutManager(this))
+        recyclerView.setAdapter(adapter)
+        adapter!!.startListening()
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (adapter != null) adapter!!.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (adapter != null) adapter!!.stopListening()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (adapter != null) adapter!!.startListening()
     }
 }

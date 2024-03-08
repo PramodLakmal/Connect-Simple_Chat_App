@@ -1,13 +1,9 @@
 package com.example.connect.utils
 
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import java.text.SimpleDateFormat
 
 
 object FirebaseUtil {
@@ -22,6 +18,10 @@ object FirebaseUtil {
 
     fun currentUserDetails(): DocumentReference {
         return FirebaseFirestore.getInstance().collection("users").document((currentUserId())!!)
+    }
+
+    fun allUserCollectionReference(): CollectionReference {
+        return FirebaseFirestore.getInstance().collection("users")
     }
 
 }
