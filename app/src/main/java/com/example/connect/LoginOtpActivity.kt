@@ -19,6 +19,8 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
 import com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.TimeUnit
 
 class LoginOtpActivity : AppCompatActivity() {
@@ -47,6 +49,21 @@ class LoginOtpActivity : AppCompatActivity() {
 
         sendOtp(phoneNumber, false)
 
+        nextBtn.setOnClickListener(View.OnClickListener {
+            val otp = otpInput.text.toString()
+            if (otp.isEmpty()) {
+                otpInput.error = "OTP cannot be empty"
+                return@OnClickListener
+            }
+            val credential = PhoneAuthProvider.getCredential(verificationCode, otp)
+            signIn(credential)
+            setInProgress(true)
+        })
+
+        resendOtpTextView.setOnClickListener {
+            sendOtp(phoneNumber, true)
+        }
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -56,6 +73,7 @@ class LoginOtpActivity : AppCompatActivity() {
     }
 
     fun sendOtp(phoneNumber: String?, isResend: Boolean) {
+        startResendTimer()
         setInProgress(true)
         val builder = PhoneAuthOptions.newBuilder(mAuth)
             .setPhoneNumber(phoneNumber!!)
@@ -115,6 +133,22 @@ class LoginOtpActivity : AppCompatActivity() {
                 AndroidUtil.showToast(applicationContext, "OTP verification failed")
             }
         }
+    }
+
+    fun startResendTimer() {
+        resendOtpTextView.setEnabled(false)
+        val timer = Timer()
+        timer.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                timeoutSeconds--
+                resendOtpTextView.text = "Resend OTP in $timeoutSeconds seconds"
+                if (timeoutSeconds <= 0) {
+                    timeoutSeconds = 30L
+                    timer.cancel()
+                    runOnUiThread { resendOtpTextView.setEnabled(true) }
+                }
+            }
+        }, 0, 1000)
     }
 
 }
