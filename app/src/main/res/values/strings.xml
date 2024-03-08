@@ -19,4 +19,7 @@
     <string name="profile">Profile</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_user">Search User</string>
+    <string name="search_image">search image</string>
+    <string name="back_button">back button</string>
 </resources>
