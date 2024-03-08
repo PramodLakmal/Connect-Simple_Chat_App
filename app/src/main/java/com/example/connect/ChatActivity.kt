@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.connect.model.ChatMessageModel
 import com.example.connect.model.ChatroomModel
 import com.example.connect.model.UserModel
 import com.example.connect.utils.AndroidUtil
@@ -53,6 +54,15 @@ class ChatActivity : AppCompatActivity() {
 
         otherUsername?.text = otherUser?.username
 
+        sendMessageBtn.setOnClickListener {
+            val message = messageInput.text.toString().trim()
+            if (message.isEmpty()) {
+                return@setOnClickListener
+            }
+            sendMessageToUser(message)
+        }
+
+
         getOrCreateChatroomModel()
 
 
@@ -80,5 +90,26 @@ class ChatActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun sendMessageToUser(message: String) {
+        chatroomModel?.lastMessageTimestamp = Timestamp.now()
+        chatroomModel?.lastMessageSenderId = FirebaseUtil.currentUserId()
+        chatroomModel?.lastMessage = message
+        chatroomModel?.let { FirebaseUtil.getChatroomReference(chatroomId).set(it) }
+
+        val chatMessageModel = ChatMessageModel.ChatMessageModel(
+            message,
+            FirebaseUtil.currentUserId(),
+            Timestamp.now()
+        )
+        FirebaseUtil.getChatroomMessageReference(chatroomId).add(chatMessageModel)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    messageInput.setText("")
+
+                }
+            }
+    }
+
 
 }
