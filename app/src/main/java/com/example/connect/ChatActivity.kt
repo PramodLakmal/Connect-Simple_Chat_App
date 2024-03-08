@@ -11,8 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.connect.model.ChatroomModel
 import com.example.connect.model.UserModel
 import com.example.connect.utils.AndroidUtil
+import com.example.connect.utils.FirebaseUtil
+import com.google.firebase.Timestamp
+import java.util.Arrays
 
 class ChatActivity : AppCompatActivity() {
 
@@ -24,6 +28,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private var otherUser: UserModel? = null
     private lateinit var chatroomId: String
+    private var chatroomModel: ChatroomModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -31,7 +36,7 @@ class ChatActivity : AppCompatActivity() {
 
         // Get UserModel
         otherUser = AndroidUtil.getUserModelFromIntent(intent)
-
+        chatroomId = FirebaseUtil.getChatroomId(FirebaseUtil.currentUserId()!!, otherUser?.userId!!)
         messageInput = findViewById(R.id.chat_message_input)
         sendMessageBtn = findViewById(R.id.message_send_btn)
         backBtn = findViewById(R.id.back_btn)
@@ -48,6 +53,8 @@ class ChatActivity : AppCompatActivity() {
 
         otherUsername?.text = otherUser?.username
 
+        getOrCreateChatroomModel()
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -55,4 +62,23 @@ class ChatActivity : AppCompatActivity() {
             insets
         }
     }
+
+    private fun getOrCreateChatroomModel() {
+        FirebaseUtil.getChatroomReference(chatroomId).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val chatroomModel = task.result?.toObject(ChatroomModel::class.java)
+                if (chatroomModel == null) {
+                    // First time chat
+                    val newChatroomModel = ChatroomModel(
+                        chatroomId,
+                        otherUser?.let { listOf(FirebaseUtil.currentUserId(), it.userId) },
+                        Timestamp.now(),
+                        ""
+                    )
+                    FirebaseUtil.getChatroomReference(chatroomId).set(newChatroomModel)
+                }
+            }
+        }
+    }
+
 }
