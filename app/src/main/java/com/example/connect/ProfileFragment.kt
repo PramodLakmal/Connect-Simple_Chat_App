@@ -20,8 +20,10 @@ import com.example.connect.model.UserModel
 import com.example.connect.utils.AndroidUtil
 import com.example.connect.utils.FirebaseUtil
 import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.UploadTask
 
 
@@ -32,7 +34,7 @@ class ProfileFragment : Fragment() {
     var phoneInput: EditText? = null
     var updateProfileBtn: Button? = null
     var progressBar: ProgressBar? = null
-    var logoutBtn: TextView? = null
+    lateinit var logoutBtn: TextView
     var currentUserModel: UserModel? = null
     var imagePickLauncher: ActivityResultLauncher<Intent>? = null
     var selectedImageUri: Uri? = null
@@ -68,20 +70,16 @@ class ProfileFragment : Fragment() {
 
         updateProfileBtn?.setOnClickListener { updateBtnClick() }
 
-        logoutBtn?.setOnClickListener {
-            FirebaseUtil.logout()
-            val intent = Intent(context, SplashActivity::class.java)
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(intent)
-        }
-
-        profilePic?.setOnClickListener(View.OnClickListener { v: View? ->
-            ImagePicker.with(this).cropSquare().compress(512).maxResultSize(512, 512)
-                .createIntent { intent: Intent ->
-                    imagePickLauncher!!.launch(intent)
-                    null
+        logoutBtn.setOnClickListener {
+            FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    FirebaseUtil.logout()
+                    val intent = Intent(context, SplashActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                 }
-        })
+            }
+        }
 
         return view
     }

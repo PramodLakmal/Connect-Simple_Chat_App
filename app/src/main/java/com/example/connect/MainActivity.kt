@@ -2,12 +2,16 @@ package com.example.connect
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.connect.utils.FirebaseUtil
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         }
         bottomNavigationView.selectedItemId = R.id.menu_chat
 
+        fCMToken
+
 
         searchButton.setOnClickListener {
             startActivity(Intent(this@MainActivity, SearchUserActivity::class.java))
@@ -50,4 +56,17 @@ class MainActivity : AppCompatActivity() {
             insets
         }
     }
+
+    val fCMToken: Unit
+        get() {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task: Task<String?> ->
+                if (task.isSuccessful) {
+
+                    val token = task.result
+
+                    Log.i("FCM", "Token: $token")
+                    FirebaseUtil.currentUserDetails().update("fcmToken", token)
+                }
+            }
+        }
 }
