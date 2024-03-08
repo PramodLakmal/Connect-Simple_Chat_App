@@ -7,4 +7,12 @@
     <string name="_3">3</string>
     <string name="mobile">Mobile</string>
     <string name="send_otp">SEND OTP</string>
+    <string name="enter_otp_sent_to_your_mobile_number">Enter OTP sent to your mobile number</string>
+    <string name="otp">OTP</string>
+    <string name="next">NEXT</string>
+    <string name="let_me_in">Let me in</string>
+    <string name="username">Username</string>
+    <string name="enter_your_username">Enter your username</string>
+    <string name="person">person</string>
+    <string name="resend_otp_in_30_sec">Resend OTP in 30 sec</string>
 </resources>
