@@ -1,13 +1,14 @@
 package com.example.connect.adapter
 
 import android.content.Context
-import android.net.Uri
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.connect.ChatActivity
 import com.example.connect.R
 import com.example.connect.model.UserModel
 import com.example.connect.utils.AndroidUtil
@@ -31,6 +32,16 @@ class SearchUserRecyclerAdapter(
         if (model.userId.equals(FirebaseUtil.currentUserId())) {
             holder.usernameText.text = model.username + "(Me)"
         }
+
+        holder.itemView.setOnClickListener {
+            // Navigate to chat activity
+            val intent = Intent(context, ChatActivity::class.java).apply {
+                AndroidUtil.passUserModelAsIntent(this, model)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+        }
+
 
     }
 
