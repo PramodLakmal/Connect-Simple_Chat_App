@@ -29,6 +29,15 @@ class SearchUserRecyclerAdapter(
         if (model.userId == FirebaseUtil.currentUserId()) {
             holder.usernameText.text = model.username + " (Me)"
         }
+
+        FirebaseUtil.getOtherProfilePicStorageRef(model?.userId).downloadUrl
+            .addOnCompleteListener { task: Task<Uri?> ->
+                if (task.isSuccessful) {
+                    val uri: Uri? = task.result
+                    AndroidUtil.setProfilePic(context, uri, holder.profilePic)
+                }
+            }
+
         holder.itemView.setOnClickListener {
             //navigate to chat activity
             val intent = Intent(context, ChatActivity::class.java)

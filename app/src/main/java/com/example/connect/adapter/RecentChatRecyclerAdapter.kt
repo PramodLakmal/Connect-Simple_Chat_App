@@ -36,6 +36,14 @@ class RecentChatRecyclerAdapter(
                         model.lastMessageSenderId == FirebaseUtil.currentUserId()
                     val otherUserModel = task.result.toObject(UserModel::class.java)
 
+                    FirebaseUtil.getOtherProfilePicStorageRef(otherUserModel?.userId).downloadUrl
+                        .addOnCompleteListener { task: Task<Uri?> ->
+                            if (task.isSuccessful) {
+                                val uri: Uri? = task.result
+                                AndroidUtil.setProfilePic(context, uri, holder.profilePic)
+                            }
+                        }
+
                     if (otherUserModel != null) {
                         holder.usernameText.text = otherUserModel.username
                     }

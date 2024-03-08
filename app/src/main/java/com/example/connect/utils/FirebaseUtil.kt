@@ -5,6 +5,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import java.text.SimpleDateFormat
 
 
@@ -60,6 +62,14 @@ object FirebaseUtil {
     }
     fun logout() {
         FirebaseAuth.getInstance().signOut()
+    }
+    val currentProfilePicStorageRef: StorageReference
+        get() = FirebaseStorage.getInstance().reference.child("profile_pic")
+            .child(currentUserId()!!)
+
+    fun getOtherProfilePicStorageRef(otherUserId: String?): StorageReference {
+        return FirebaseStorage.getInstance().reference.child("profile_pic")
+            .child(otherUserId!!)
     }
 
 }

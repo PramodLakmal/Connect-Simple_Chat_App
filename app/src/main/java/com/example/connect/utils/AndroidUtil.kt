@@ -2,7 +2,11 @@ package com.example.connect.utils
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.widget.ImageView
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.connect.model.UserModel
 
 class AndroidUtil {
@@ -26,6 +30,12 @@ class AndroidUtil {
             userModel.userId = intent.getStringExtra("userId")
             userModel.fcmToken = intent.getStringExtra("fcmToken")
             return userModel
+        }
+
+        fun setProfilePic(context: Context?, imageUri: Uri?, imageView: ImageView?) {
+            Glide.with(context!!).load(imageUri).apply(RequestOptions.circleCropTransform()).into(
+                imageView!!
+            )
         }
 
     }

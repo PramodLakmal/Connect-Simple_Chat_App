@@ -1,5 +1,6 @@
 package com.example.connect
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,10 +13,13 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.connect.model.UserModel
 import com.example.connect.utils.AndroidUtil
 import com.example.connect.utils.FirebaseUtil
+import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.storage.UploadTask
@@ -33,6 +37,21 @@ class ProfileFragment : Fragment() {
     var imagePickLauncher: ActivityResultLauncher<Intent>? = null
     var selectedImageUri: Uri? = null
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        imagePickLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                if (data?.data != null) {
+                    selectedImageUri = data.data
+                    AndroidUtil.setProfilePic(context, selectedImageUri, profilePic)
+                }
+            }
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,10 +74,19 @@ class ProfileFragment : Fragment() {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         }
+
+        profilePic?.setOnClickListener(View.OnClickListener { v: View? ->
+            ImagePicker.with(this).cropSquare().compress(512).maxResultSize(512, 512)
+                .createIntent { intent: Intent ->
+                    imagePickLauncher!!.launch(intent)
+                    null
+                }
+        })
+
         return view
     }
 
-    fun updateBtnClick() {
+    private fun updateBtnClick() {
         val newUsername = usernameInput!!.text.toString()
         if (newUsername.isEmpty() || newUsername.length < 3) {
             usernameInput!!.error = "Username length should be at least 3 chars"
@@ -67,9 +95,14 @@ class ProfileFragment : Fragment() {
         currentUserModel?.username = newUsername
         setInProgress(true)
 
+        if (selectedImageUri != null) {
+            FirebaseUtil.currentProfilePicStorageRef.putFile(selectedImageUri!!)
+                .addOnCompleteListener { task: Task<UploadTask.TaskSnapshot?>? -> updateToFirestore() }
+        } else {
             updateToFirestore()
+        }
     }
-    fun updateToFirestore() {
+    private fun updateToFirestore() {
         FirebaseUtil.currentUserDetails().set(currentUserModel!!)
             .addOnCompleteListener { task: Task<Void?> ->
                 setInProgress(false)
@@ -81,9 +114,18 @@ class ProfileFragment : Fragment() {
             }
     }
 
-    val userData: Unit
+    private val userData: Unit
         get() {
             setInProgress(true)
+
+            FirebaseUtil.currentProfilePicStorageRef.downloadUrl
+                .addOnCompleteListener { task: Task<Uri?> ->
+                    if (task.isSuccessful) {
+                        val uri: Uri? = task.result
+                        AndroidUtil.setProfilePic(context, uri, profilePic)
+                    }
+                }
+
             FirebaseUtil.currentUserDetails().get()
                 .addOnCompleteListener { task: Task<DocumentSnapshot> ->
                     setInProgress(false)
@@ -93,7 +135,7 @@ class ProfileFragment : Fragment() {
                 }
         }
 
-    fun setInProgress(inProgress: Boolean) {
+    private fun setInProgress(inProgress: Boolean) {
         if (inProgress) {
             progressBar!!.visibility = View.VISIBLE
             updateProfileBtn!!.visibility = View.GONE

@@ -1,6 +1,7 @@
 package com.example.connect
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageButton
@@ -51,6 +52,14 @@ class ChatActivity : AppCompatActivity() {
         otherUsername = findViewById(R.id.other_username)
         recyclerView = findViewById(R.id.chat_recycler_view)
         imageView = findViewById(R.id.profile_pic_image_view)
+
+        FirebaseUtil.getOtherProfilePicStorageRef(otherUser?.userId).downloadUrl
+            .addOnCompleteListener { task: Task<Uri?> ->
+                if (task.isSuccessful) {
+                    val uri: Uri? = task.result
+                    AndroidUtil.setProfilePic(this, uri, imageView)
+                }
+            }
 
 
         backBtn.setOnClickListener {
