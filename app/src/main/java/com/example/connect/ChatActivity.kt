@@ -173,7 +173,7 @@ class ChatActivity : AppCompatActivity() {
         val request = Request.Builder()
             .url(url)
             .post(body)
-            .addHeader("Authorization", "Bearer AAAATr9jQbc:APA91bHk4DU0ECad1lwcruXEMP7DV6LpRBDuvU4llId6pEemI7lYCrO4Mdhk_ZZ5tWoDq8etU1_jixRhG_FgXPTOrVHsLi7nxsYV-fKWxhG2hUj2XRT7WIXRjtJSiWjv3UbNT70OyGEE")
+            .addHeader("Authorization", "Bearer APIKEY")
             .build()
 
         client.newCall(request).enqueue(object : Callback {
