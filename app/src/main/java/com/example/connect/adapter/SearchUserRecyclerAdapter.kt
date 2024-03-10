@@ -30,7 +30,7 @@ class SearchUserRecyclerAdapter(
             holder.usernameText.text = model.username + " (Me)"
         }
 
-        FirebaseUtil.getOtherProfilePicStorageRef(model?.userId).downloadUrl
+        FirebaseUtil.getOtherProfilePicStorageRef(model.userId).downloadUrl
             .addOnCompleteListener { task: Task<Uri?> ->
                 if (task.isSuccessful) {
                     val uri: Uri? = task.result

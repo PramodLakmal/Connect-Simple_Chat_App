@@ -51,9 +51,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.ccp)
 
-    implementation (libs.firebase.bom)
+    implementation (platform(libs.firebase.bom))
     implementation ("com.google.firebase:firebase-auth")
     implementation (libs.firebase.ui.firestore)
     implementation (libs.imagepicker)
     implementation (libs.glide)
+    implementation(libs.okhttp)
 }

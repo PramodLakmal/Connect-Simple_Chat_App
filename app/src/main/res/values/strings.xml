@@ -24,4 +24,8 @@
     <string name="back_button">back button</string>
     <string name="user_name">User name</string>
     <string name="_000000000000">+000000000000</string>
+    <string name="phone">Phone</string>
+    <string name="update_profile">Update profile</string>
+    <string name="logout">Logout</string>
+    <string name="welcome_back">Welcome Back</string>
 </resources>

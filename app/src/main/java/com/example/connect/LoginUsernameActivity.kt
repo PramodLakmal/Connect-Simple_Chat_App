@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,6 +26,8 @@ class LoginUsernameActivity : AppCompatActivity() {
     private lateinit var phoneNumber: String
     private var userModel : UserModel? = null
 
+    private lateinit var usernameHint: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,6 +36,8 @@ class LoginUsernameActivity : AppCompatActivity() {
         usernameInput = findViewById(R.id.login_username)
         letMeInBtn = findViewById(R.id.login_let_me_in_btn)
         progressBar = findViewById(R.id.login_progress_bar)
+
+        usernameHint = findViewById(R.id.username_hint)
 
         phoneNumber = intent.extras!!.getString("phone")!!
         getUsername()
@@ -47,6 +52,7 @@ class LoginUsernameActivity : AppCompatActivity() {
             insets
         }
     }
+
     private fun setUsername() {
         val username = usernameInput.text.toString()
         if (username.isEmpty() || username.length < 3) {
@@ -81,13 +87,16 @@ class LoginUsernameActivity : AppCompatActivity() {
                 val documentSnapshot = task.result
                 userModel = documentSnapshot.toObject<UserModel>()
                 if (userModel != null) {
+                    // Display the username if available
                     usernameInput.setText(userModel!!.username)
+                    usernameHint.text = getString(R.string.welcome_back)
+
+                    // Make the username input field uneditable
+                    usernameInput.isEnabled = false
                 }
             }
         }
     }
-
-
 
     private fun setInProgress(inProgress: Boolean) {
         if (inProgress) {
@@ -98,5 +107,4 @@ class LoginUsernameActivity : AppCompatActivity() {
             letMeInBtn.visibility = View.VISIBLE
         }
     }
-
 }

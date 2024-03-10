@@ -25,6 +25,18 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
 
 class ChatActivity : AppCompatActivity() {
 
@@ -90,7 +102,7 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    fun setupChatRecyclerView() {
+    private fun setupChatRecyclerView() {
         val query = FirebaseUtil.getChatroomMessageReference(chatroomId)
             .orderBy("timestamp", Query.Direction.DESCENDING)
         val options = FirestoreRecyclerOptions.Builder<ChatMessageModel>()
@@ -101,6 +113,7 @@ class ChatActivity : AppCompatActivity() {
         recyclerView!!.setLayoutManager(manager)
         recyclerView!!.setAdapter(adapter)
         adapter!!.startListening()
+
         adapter!!.registerAdapterDataObserver(object : AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
@@ -109,7 +122,7 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    fun sendMessageToUser(message: String?) {
+    private fun sendMessageToUser(message: String?) {
         chatroomModel?.lastMessageTimestamp = Timestamp.now()
         chatroomModel?.lastMessageSenderId = FirebaseUtil.currentUserId()
         chatroomModel?.lastMessage = message
@@ -121,9 +134,60 @@ class ChatActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     messageInput!!.setText("")
+                    sendNotification(message)
                 }
             }
     }
+
+    private fun sendNotification(message: String?) {
+        FirebaseUtil.currentUserDetails().get()
+            .addOnCompleteListener { task: Task<DocumentSnapshot> ->
+                if (task.isSuccessful) {
+                    val currentUser = task.result.toObject(UserModel::class.java)
+                    try {
+                        val jsonObject = JSONObject()
+                        val notificationObj = JSONObject()
+                        if (currentUser != null) {
+                            notificationObj.put("title", currentUser.username)
+                        }
+                        notificationObj.put("body", message)
+                        val dataObj = JSONObject()
+                        if (currentUser != null) {
+                            dataObj.put("userId", currentUser.userId)
+                        }
+                        jsonObject.put("notification", notificationObj)
+                        jsonObject.put("data", dataObj)
+                        jsonObject.put("to", otherUser?.fcmToken ?: "")
+                        callApi(jsonObject)
+                    } catch (e: Exception) {
+                    }
+                }
+            }
+    }
+
+    private fun callApi(jsonObject: JSONObject) {
+        val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
+        val client = OkHttpClient()
+        val url = "https://fcm.googleapis.com/fcm/send"
+        val body = jsonObject.toString().toRequestBody(JSON)
+        val request = Request.Builder()
+            .url(url)
+            .post(body)
+            .addHeader("Authorization", "Bearer AAAATr9jQbc:APA91bHk4DU0ECad1lwcruXEMP7DV6LpRBDuvU4llId6pEemI7lYCrO4Mdhk_ZZ5tWoDq8etU1_jixRhG_FgXPTOrVHsLi7nxsYV-fKWxhG2hUj2XRT7WIXRjtJSiWjv3UbNT70OyGEE")
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle failure
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                // Handle response
+            }
+        })
+    }
+
+
 
     private val orCreateChatroomModel: Unit
         get() {

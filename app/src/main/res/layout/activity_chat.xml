@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
+    android:background="@color/my_primary"
     android:layout_height="match_parent"
     tools:context=".ChatActivity">
 
@@ -46,12 +47,20 @@
 
     </RelativeLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:background="@drawable/background_content_top"
         android:layout_below="@id/toolbar"
-        android:layout_above="@id/bottom_layout"
-        android:id="@+id/chat_recycler_view"/>
+        android:layout_above="@id/bottom_layout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chat_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -82,7 +91,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="@color/my_primary"
+            app:tint="@color/white"
             android:id="@+id/message_send_btn"
             android:padding="8dp"
             android:layout_marginStart="10dp"

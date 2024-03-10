@@ -86,7 +86,7 @@ class LoginOtpActivity : AppCompatActivity() {
                 }
 
                 override fun onVerificationFailed(e: FirebaseException) {
-                    AndroidUtil.showToast(applicationContext, "OTP verification failed")
+                    AndroidUtil.showToast(applicationContext, "OTP sending failed")
                     setInProgress(false)
                 }
 

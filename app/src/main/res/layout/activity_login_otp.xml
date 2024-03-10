@@ -78,7 +78,7 @@
         android:layout_gravity="center_vertical"
         android:letterSpacing="0.08"
         android:textStyle="bold"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:layout_weight="5"/>
 
     <LinearLayout

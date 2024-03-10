@@ -68,6 +68,7 @@ class ProfileFragment : Fragment() {
 
         userData
 
+
         updateProfileBtn?.setOnClickListener { updateBtnClick() }
 
         logoutBtn.setOnClickListener {
@@ -79,6 +80,15 @@ class ProfileFragment : Fragment() {
                     startActivity(intent)
                 }
             }
+        }
+        profilePic?.setOnClickListener {
+            ImagePicker.with(this)
+                .cropSquare()
+                .compress(512)
+                .maxResultSize(512, 512)
+                .createIntent { intent ->
+                    imagePickLauncher?.launch(intent)
+                }
         }
 
         return view

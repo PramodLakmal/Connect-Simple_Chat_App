@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ProfileFragment"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:layout_margin="20dp">
+    android:layout_marginTop="?attr/actionBarSize">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Profile"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:id="@+id/profile_label"/>
 
     <ImageView
         android:layout_width="160dp"
@@ -15,59 +24,78 @@
         android:backgroundTint="@color/my_primary"
         android:src="@drawable/person_icon"
         android:scaleType="centerCrop"
-        android:layout_marginBottom="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/profile_label"
+        android:layout_marginTop="20dp"
         android:id="@+id/profile_image_view"/>
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:hint="Username"
+        android:padding="15dp"
+        android:hint="@string/username"
         android:inputType="text"
-        android:layout_margin="10dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/edit_text_rounded_corner"
         android:elevation="5dp"
         android:id="@+id/profile_username"
-        />
+        android:layout_below="@id/profile_image_view"
+        android:layout_marginTop="20dp"
+        android:drawableStart="@drawable/person_icon"
+        android:drawablePadding="10dp"/>
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:hint="Phone"
+        android:padding="15dp"
+        android:hint="@string/phone"
         android:inputType="text"
-        android:layout_margin="10dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/edit_text_rounded_corner"
         android:elevation="5dp"
         android:enabled="false"
         android:id="@+id/profile_phone"
-        />
+        android:layout_below="@id/profile_username"
+        android:layout_marginTop="20dp"
+        android:drawableStart="@drawable/phone_icon"
+        android:drawablePadding="10dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:background="@drawable/btn_rounded_corner"
+        android:text="@string/update_profile"
+        android:textColor="@android:color/white"
+        android:id="@+id/profle_update_btn"
+        android:layout_below="@id/profile_phone"
+        android:layout_marginTop="30dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="center_vertical"
-        android:layout_marginTop="20dp"
-        android:orientation="vertical">
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_rounded_corner"
-            android:text="Update profile"
-            android:id="@+id/profle_update_btn"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/profle_update_btn"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal">
+
         <ProgressBar
             android:layout_width="32dp"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:indeterminateTint="@color/my_primary"
-            android:layout_gravity="center"
-            android:id="@+id/profile_progress_bar"/>
+            android:id="@+id/profile_progress_bar"
+            android:visibility="gone"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/logout"
+            android:textColor="@color/my_primary"
+            android:id="@+id/logout_btn"
+            android:layout_marginTop="10dp"/>
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:id="@+id/logout_btn"/>
-
-
-
-</LinearLayout>
+</RelativeLayout>
